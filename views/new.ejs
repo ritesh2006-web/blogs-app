@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>New Note + Ask AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f7fb;
+      color: #333;
+    }
+
+    header {
+      background-color: #007ACD;
+      padding: 1rem 2rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+    }
+
+    .btn {
+      background-color: #fff;
+      color: #007ACD;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #e0e0e0;
+    }
+
+    .form-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .note-form, .chatbot-box {
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .note-form input,
+    .note-form textarea,
+    .chat-form input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .note-form button,
+    .chat-form button {
+      background-color: #4A90E2;
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .chatbot-box h2 {
+      margin-bottom: 1rem;
+      color: #4A90E2;
+    }
+
+    .chat-response {
+      background-color: #f1f9ff;
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid #4A90E2;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 1rem;
+    }
+
+    #loading p {
+      color: #4A90E2;
+      font-style: italic;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>📝 Add Note</h1>
+    <a href="/dashboard" class="btn">← Back</a>
+  </header>
+
+  <main class="form-section">
+    <!-- Note creation form -->
+    <form action="/notes/new" method="POST" class="note-form">
+      <input type="text" name="title" placeholder="Title" required />
+      <textarea name="content" rows="6" placeholder="Write your note..." required></textarea>
+      <button type="submit">Save Note</button>
+    </form>
+
+    <!-- AI Chat Section -->
+    <div class="chatbot-box">
+      <h2>🤖 Ask Buddy</h2>
+
+      <form action="/ask" method="POST" class="chat-form" onsubmit="showLoading()">
+        <input type="text" name="prompt" id="aiPrompt" placeholder="Ask anything..." required />
+        <button type="submit">Ask</button>
+      </form>
+
+      <!-- Loading message -->
+      <div id="loading" style="display: none; margin-top: 1rem;">
+        <p>🤖 Generating response...</p>
+      </div>
+
+      <!-- AI Response (rendered HTML from Markdown) -->
+      <% if (response) { %>
+        <div class="chat-response">
+          <%- response %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <script>
+    function showLoading() {
+      document.getElementById("loading").style.display = "block";
+    }
+  </script>
+</body>
+</html>

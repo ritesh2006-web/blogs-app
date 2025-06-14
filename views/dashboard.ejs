@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | BookBuddy</title>
+  <link rel="stylesheet" href="/dashboard.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    .chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .chatbot-toggle {
+      background-color: #4A90E2;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .chatbot-panel {
+      width: 320px;
+      height: 450px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      display: none;
+      flex-direction: column;
+      border: 1px solid #ccc;
+    }
+
+    .chat-header {
+      background-color: #4A90E2;
+      color: white;
+      padding: 12px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      background-color: #f9f9f9;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-input-area {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    .chat-input-area button {
+      padding: 8px 12px;
+      background-color: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .bot-msg, .user-msg {
+      padding: 8px 12px;
+      margin: 6px 0;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .bot-msg {
+      background-color: #e0f3ff;
+      align-self: flex-start;
+    }
+
+    .user-msg {
+      background-color: #d1ffd1;
+      align-self: flex-end;
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Nav -->
+  <nav class="nav-bar">
+    <div class="left-nav">
+      <img src="/ChatGPT Image Jun 14, 2025, 01_30_28 PM.png" alt="Logo" class="logo" />
+      <span class="brand-name">BookBuddy</span>
+    </div>
+    <div class="right-nav">
+      <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <p class="username">Hello, <%= user.name %></p>
+      <ul>
+        <li><a href="/new">+ Add New Note</a></li>
+      </ul>
+    </aside>
+
+    <main class="notes-area">
+      <h2>📚 Your Notes</h2>
+      <% if (notes.length === 0) { %>
+        <p>No notes yet. Click on "+ Add New Note" to create one.</p>
+      <% } else { %>
+        <% notes.forEach(note => { %>
+          <div class="note-card">
+            <h3><%= note.title %></h3>
+            <p><%= note.content %></p>
+            <form action="/edit/<%= note.id %>" method="get" style="display: inline;">
+              <button type="submit">✏️ Edit</button>
+            </form>
+            <form action="/delete/<%= note.id %>" method="post" style="display: inline;">
+              <button type="submit" onclick="return confirm('Delete this note?')">🗑️ Delete</button>
+            </form>
+          </div>
+        <% }); %>
+      <% } %>
+    </main>
+  </div>
+
+  <!-- Chatbot UI -->
+  <div class="chatbot-container">
+    <button class="chatbot-toggle" onclick="toggleChat()">💬 Ask Buddy</button>
+
+    <div class="chatbot-panel" id="chatPanel">
+      <div class="chat-header">
+        <span>🤖 AI Bot</span>
+        <button onclick="toggleChat()">✖</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <p class="bot-msg">Hi! I'm Buddy. How can I help you today?</p>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ask something..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbot Script -->
+  <script>
+    const panel = document.getElementById('chatPanel');
+    const chatBody = document.getElementById('chatBody');
+
+    function toggleChat() {
+      const isOpen = panel.classList.contains("open");
+
+      if (isOpen) {
+        panel.style.display = 'none';
+        panel.classList.remove("open");
+      } else {
+        panel.style.display = 'flex';  // Important: chatbot-panel uses flex
+        panel.classList.add("open");
+
+        // Wait for DOM to render, then scroll
+        requestAnimationFrame(() => {
+          chatBody.scrollTop = chatBody.scrollHeight;
+        });
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      const userMsg = document.createElement('p');
+      userMsg.className = 'user-msg';
+      userMsg.textContent = message;
+      chatBody.appendChild(userMsg);
+
+      input.value = '';
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      const botReply = document.createElement('p');
+      botReply.className = 'bot-msg';
+      botReply.textContent = "🤖 Generating response...";
+      chatBody.appendChild(botReply);
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        botReply.textContent = "🤖 " + data.reply;
+        chatBody.scrollTop = chatBody.scrollHeight;
+      } catch (err) {
+        botReply.textContent = "❌ Error: Could not reach AI";
+      }
+    }
+  </script>
+</body>
+</html>

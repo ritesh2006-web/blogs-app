@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Note | BookBuddy</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      color: #007ACD;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #007ACD;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005c99;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>✏️ Edit Note</h2>
+    <form action="/notes/edit/<%= note.id %>" method="POST">
+      <input type="text" name="title" value="<%= note.title %>" required />
+      <textarea name="content" rows="6" required><%= note.content %></textarea>
+      <button type="submit">Update Note</button>
+    </form>
+  </div>
+</body>
+
+</html>
